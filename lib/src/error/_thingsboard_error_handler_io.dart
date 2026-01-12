@@ -23,7 +23,7 @@ int httpStatusToThingsboardErrorCode(int status) {
   }
 }
 
-ThingsboardError toThingsboardError(error, [StackTrace? stackTrace]) {
+ThingsboardError toThingsboardError(dynamic error, [StackTrace? stackTrace]) {
   ThingsboardError? tbError;
   if (error is DioException) {
     if (error.response != null && error.response!.data != null) {
@@ -41,31 +41,15 @@ ThingsboardError toThingsboardError(error, [StackTrace? stackTrace]) {
       if (error.error is ThingsboardError) {
         tbError = error.error as ThingsboardError;
       } else if (error.error is SocketException) {
-        tbError = ThingsboardError(
-            error: error,
-            message: 'Unable to connect',
-            errorCode: ThingsBoardErrorCode.general);
+        tbError = ThingsboardError(error: error, message: 'Unable to connect', errorCode: ThingsBoardErrorCode.general);
       } else {
-        tbError = ThingsboardError(
-            error: error,
-            message: error.error.toString(),
-            errorCode: ThingsBoardErrorCode.general);
+        tbError = ThingsboardError(error: error, message: error.error.toString(), errorCode: ThingsBoardErrorCode.general);
       }
     }
-    if (tbError == null &&
-        error.response != null &&
-        error.response!.statusCode != null) {
+    if (tbError == null && error.response != null && error.response!.statusCode != null) {
       var httpStatus = error.response!.statusCode!;
-      var message = (httpStatus.toString() +
-          ': ' +
-          (error.response!.statusMessage != null
-              ? error.response!.statusMessage!
-              : 'Unknown'));
-      tbError = ThingsboardError(
-          error: error,
-          message: message,
-          errorCode: httpStatusToThingsboardErrorCode(httpStatus),
-          status: httpStatus);
+      var message = (httpStatus.toString() + ': ' + (error.response!.statusMessage != null ? error.response!.statusMessage! : 'Unknown'));
+      tbError = ThingsboardError(error: error, message: message, errorCode: httpStatusToThingsboardErrorCode(httpStatus), status: httpStatus);
     }
   } else if (error is ThingsboardError) {
     tbError = error;
@@ -73,20 +57,14 @@ ThingsboardError toThingsboardError(error, [StackTrace? stackTrace]) {
   if (tbError != null && tbError.errorCode == null && tbError.status != null) {
     tbError.errorCode = httpStatusToThingsboardErrorCode(tbError.status!);
   }
-  tbError ??= ThingsboardError(
-      error: error,
-      message: error.toString(),
-      errorCode: ThingsBoardErrorCode.general);
+  tbError ??= ThingsboardError(error: error, message: error.toString(), errorCode: ThingsBoardErrorCode.general);
 
   StackTrace? errorStackTrace;
   if (tbError.error is Error) {
     errorStackTrace = tbError.error.stackTrace;
   }
 
-  tbError.stackTrace = stackTrace ??
-      tbError.getStackTrace() ??
-      errorStackTrace ??
-      StackTrace.current;
+  tbError.stackTrace = stackTrace ?? tbError.getStackTrace() ?? errorStackTrace ?? StackTrace.current;
 
   return tbError;
 }

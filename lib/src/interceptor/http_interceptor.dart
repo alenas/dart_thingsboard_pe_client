@@ -23,20 +23,14 @@ class HttpInterceptor extends QueuedInterceptor {
 
   int _activeRequests = 0;
 
-  HttpInterceptor(
-      this._dio,
-      this._tbClient,
-      void Function() onLoadStart,
-      void Function() onLoadFinish,
-      void Function(ThingsboardError error) onError)
+  HttpInterceptor(this._dio, this._tbClient, void Function() onLoadStart, void Function() onLoadFinish, void Function(ThingsboardError error) onError)
       : _internalDio = Dio(BaseOptions(baseUrl: _dio.options.baseUrl)),
         _loadStart = onLoadStart,
         _loadFinish = onLoadFinish,
         _onError = onError;
 
   @override
-  Future onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+  Future onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     if (options.path.startsWith('/api/')) {
       var config = _getInterceptorConfig(options);
       var isLoading = !_isInternalUrlPrefix(options.path);
@@ -44,13 +38,10 @@ class HttpInterceptor extends QueuedInterceptor {
         _updateLoadingState(config, isLoading);
       }
       if (_isTokenBasedAuthEntryPoint(options.path)) {
-        if (_tbClient.getJwtToken() == null &&
-            !_tbClient.refreshTokenPending()) {
-          return _handleRequestError(
-              options, handler, ThingsboardError(message: 'Unauthorized!'));
+        if (_tbClient.getJwtToken() == null && !_tbClient.refreshTokenPending()) {
+          return _handleRequestError(options, handler, ThingsboardError(message: 'Unauthorized!'));
         } else if (!_tbClient.isJwtTokenValid()) {
-          return _handleRequestError(
-              options, handler, ThingsboardError(refreshTokenPending: true));
+          return _handleRequestError(options, handler, ThingsboardError(refreshTokenPending: true));
         } else {
           return _jwtIntercept(options, handler);
         }
@@ -62,32 +53,25 @@ class HttpInterceptor extends QueuedInterceptor {
     }
   }
 
-  Future _jwtIntercept(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+  Future _jwtIntercept(RequestOptions options, RequestInterceptorHandler handler) async {
     if (_updateAuthorizationHeader(options)) {
       return _handleRequest(options, handler);
     } else {
-      return _handleRequestError(options, handler,
-          ThingsboardError(message: 'Could not get JWT token from store.'));
+      return _handleRequestError(options, handler, ThingsboardError(message: 'Could not get JWT token from store.'));
     }
   }
 
-  Future _handleRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+  Future _handleRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     return handler.next(options);
   }
 
-  Future _handleRequestError(RequestOptions options,
-      RequestInterceptorHandler handler, ThingsboardError error) async {
-    var response =
-        Response<ThingsboardError>(requestOptions: options, data: error);
-    return handler.reject(
-        DioException(response: response, requestOptions: options), true);
+  Future _handleRequestError(RequestOptions options, RequestInterceptorHandler handler, ThingsboardError error) async {
+    var response = Response<ThingsboardError>(requestOptions: options, data: error);
+    return handler.reject(DioException(response: response, requestOptions: options), true);
   }
 
   @override
-  Future onResponse(
-      Response response, ResponseInterceptorHandler handler) async {
+  Future onResponse(Response response, ResponseInterceptorHandler handler) async {
     var config = _getInterceptorConfig(response.requestOptions);
     if (response.requestOptions.path.startsWith('/api/')) {
       _updateLoadingState(config, false);
@@ -104,10 +88,8 @@ class HttpInterceptor extends QueuedInterceptor {
     var tbError = toThingsboardError(error);
     var errorCode = tbError.errorCode;
     var refreshToken = false;
-    if (tbError.refreshTokenPending == true ||
-        error.response?.statusCode == 401) {
-      if (tbError.refreshTokenPending == true ||
-          errorCode == ThingsBoardErrorCode.jwtTokenExpired) {
+    if (tbError.refreshTokenPending == true || error.response?.statusCode == 401) {
+      if (tbError.refreshTokenPending == true || errorCode == ThingsBoardErrorCode.jwtTokenExpired) {
         refreshToken = true;
       } else if (errorCode == ThingsBoardErrorCode.credentialsExpired) {
         notify = false;
@@ -122,15 +104,12 @@ class HttpInterceptor extends QueuedInterceptor {
     if (error.requestOptions.path.startsWith('/api/')) {
       _updateLoadingState(config, false);
     }
-    return _handleError(
-        tbError, error.requestOptions, handler, notify && !ignoreErrors);
+    return _handleError(tbError, error.requestOptions, handler, notify && !ignoreErrors);
   }
 
-  Future _refreshTokenAndRetry(DioException error,
-      ErrorInterceptorHandler handler, InterceptorConfig config) async {
+  Future _refreshTokenAndRetry(DioException error, ErrorInterceptorHandler handler, InterceptorConfig config) async {
     try {
-      await _tbClient.refreshJwtToken(
-          internalDio: _internalDio, interceptRefreshToken: true);
+      await _tbClient.refreshJwtToken(internalDio: _internalDio, interceptRefreshToken: true);
     } catch (e) {
       if (error.requestOptions.path.startsWith('/api/')) {
         _updateLoadingState(config, false);
@@ -140,18 +119,15 @@ class HttpInterceptor extends QueuedInterceptor {
     return _retryRequest(error, handler);
   }
 
-  Future _retryRequestWithTimeout(
-      DioException error, ErrorInterceptorHandler handler) async {
+  Future _retryRequestWithTimeout(DioException error, ErrorInterceptorHandler handler) async {
     var rng = Random();
     var timeout = 1000 + rng.nextInt(3000);
     return _retryRequest(error, handler, timeout: timeout);
   }
 
-  Future _retryRequest(DioException error, ErrorInterceptorHandler handler,
-      {int? timeout}) async {
+  Future _retryRequest(DioException error, ErrorInterceptorHandler handler, {int? timeout}) async {
     if (timeout != null) {
-      return Future.delayed(
-          Duration(milliseconds: timeout), () => _retryRequest(error, handler));
+      return Future.delayed(Duration(milliseconds: timeout), () => _retryRequest(error, handler));
     } else {
       var options = error.requestOptions;
       var extra = options.extra;
@@ -187,14 +163,12 @@ class HttpInterceptor extends QueuedInterceptor {
     }
   }
 
-  Future _handleError(error, RequestOptions requestOptions,
-      ErrorInterceptorHandler handler, bool notify) async {
+  Future _handleError(dynamic error, RequestOptions requestOptions, ErrorInterceptorHandler handler, bool notify) async {
     var tbError = toThingsboardError(error);
     if (notify) {
       _onError(tbError);
     }
-    return handler
-        .next(DioException(requestOptions: requestOptions, error: tbError));
+    return handler.next(DioException(requestOptions: requestOptions, error: tbError));
   }
 
   InterceptorConfig _getInterceptorConfig(RequestOptions options) {
