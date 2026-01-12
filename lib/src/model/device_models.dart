@@ -808,7 +808,9 @@ class Device extends AdditionalInfoBased<DeviceId>
         name = json['name'],
         type = json['type'],
         label = json['label'],
-        deviceProfileId = DeviceProfileId.fromJson(json['deviceProfileId']),
+        deviceProfileId = json['deviceProfileId'] != null 
+            ? DeviceProfileId.fromJson(json['deviceProfileId']) 
+            : null,
         firmwareId = json['firmwareId'] != null
             ? OtaPackageId.fromJson(json['firmwareId'])
             : null,

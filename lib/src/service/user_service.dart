@@ -17,6 +17,7 @@ PageData<UserInfo> parseUsersInfoData(Map<String, dynamic> json) {
 const ACTIVATE_TOKEN_REGEX = '/api/noauth/activate?activateToken=';
 
 class UserService {
+  // ignore: non_constant_identifier_names
   final String MOBILE_TOKEN_HEADER = "X-Mobile-Token";
   final ThingsboardClient _tbClient;
 
@@ -26,13 +27,10 @@ class UserService {
 
   UserService._internal(this._tbClient);
 
-  Future<User?> getUserById(String userId,
-      {RequestConfig? requestConfig}) async {
+  Future<User?> getUserById(String userId, {RequestConfig? requestConfig}) async {
     return nullIfNotFound(
       (RequestConfig requestConfig) async {
-        var response = await _tbClient.get<Map<String, dynamic>>(
-            '/api/user/$userId',
-            options: defaultHttpOptionsFromConfig(requestConfig));
+        var response = await _tbClient.get<Map<String, dynamic>>('/api/user/$userId', options: defaultHttpOptionsFromConfig(requestConfig));
         return response.data != null ? User.fromJson(response.data!) : null;
       },
       requestConfig: requestConfig,
@@ -40,64 +38,45 @@ class UserService {
   }
 
   Future<bool> isUserTokenAccessEnabled({RequestConfig? requestConfig}) async {
-    var response = await _tbClient.get<bool>('/api/user/tokenAccessEnabled',
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response = await _tbClient.get<bool>('/api/user/tokenAccessEnabled', options: defaultHttpOptionsFromConfig(requestConfig));
     return response.data!;
   }
 
-  Future<LoginResponse?> getUserToken(String userId,
-      {RequestConfig? requestConfig}) async {
+  Future<LoginResponse?> getUserToken(String userId, {RequestConfig? requestConfig}) async {
     return nullIfNotFound(
       (RequestConfig requestConfig) async {
-        var response = await _tbClient.get<Map<String, dynamic>>(
-            '/api/user/$userId/token',
-            options: defaultHttpOptionsFromConfig(requestConfig));
-        return response.data != null
-            ? LoginResponse.fromJson(response.data!)
-            : null;
+        var response = await _tbClient.get<Map<String, dynamic>>('/api/user/$userId/token', options: defaultHttpOptionsFromConfig(requestConfig));
+        return response.data != null ? LoginResponse.fromJson(response.data!) : null;
       },
       requestConfig: requestConfig,
     );
   }
 
-  Future<User> saveUser(User user,
-      {bool sendActivationMail = false, RequestConfig? requestConfig}) async {
-    var queryParams = <String, dynamic>{
-      'sendActivationMail': sendActivationMail
-    };
+  Future<User> saveUser(User user, {bool sendActivationMail = false, RequestConfig? requestConfig}) async {
+    var queryParams = <String, dynamic>{'sendActivationMail': sendActivationMail};
     var response = await _tbClient.post<Map<String, dynamic>>('/api/user',
-        queryParameters: queryParams,
-        data: jsonEncode(user),
-        options: defaultHttpOptionsFromConfig(requestConfig));
+        queryParameters: queryParams, data: jsonEncode(user), options: defaultHttpOptionsFromConfig(requestConfig));
     return User.fromJson(response.data!);
   }
 
-  Future<void> sendActivationEmail(String email,
-      {RequestConfig? requestConfig}) async {
-    await _tbClient.post('/api/user/sendActivationMail',
-        queryParameters: {'email': email},
-        options: defaultHttpOptionsFromConfig(requestConfig));
+  Future<void> sendActivationEmail(String email, {RequestConfig? requestConfig}) async {
+    await _tbClient.post('/api/user/sendActivationMail', queryParameters: {'email': email}, options: defaultHttpOptionsFromConfig(requestConfig));
   }
 
-  Future<String> getActivationLink(String userId,
-      {RequestConfig? requestConfig}) async {
+  Future<String> getActivationLink(String userId, {RequestConfig? requestConfig}) async {
     var options = defaultHttpOptionsFromConfig(requestConfig);
     options.responseType = ResponseType.plain;
-    var response = await _tbClient
-        .get<String>('/api/user/$userId/activationLink', options: options);
+    var response = await _tbClient.get<String>('/api/user/$userId/activationLink', options: options);
     return response.data!;
   }
 
   Future<void> deleteUser(String userId, {RequestConfig? requestConfig}) async {
-    await _tbClient.delete('/api/user/$userId',
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    await _tbClient.delete('/api/user/$userId', options: defaultHttpOptionsFromConfig(requestConfig));
   }
 
-  Future<PageData<User>> getUsers(PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getUsers(PageLink pageLink, {RequestConfig? requestConfig}) async {
     var response = await _tbClient.get<Map<String, dynamic>>('/api/users',
-        queryParameters: pageLink.toQueryParameters(),
-        options: defaultHttpOptionsFromConfig(requestConfig));
+        queryParameters: pageLink.toQueryParameters(), options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
@@ -127,137 +106,97 @@ class UserService {
     return _tbClient.compute(parseUsersInfoData, response.data!);
   }
 
-  Future<PageData<User>> getTenantAdmins(String tenantId, PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getTenantAdmins(String tenantId, PageLink pageLink, {RequestConfig? requestConfig}) async {
     var queryParams = pageLink.toQueryParameters();
-    var response = await _tbClient.get<Map<String, dynamic>>(
-        '/api/tenant/$tenantId/users',
-        queryParameters: queryParams,
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response = await _tbClient.get<Map<String, dynamic>>('/api/tenant/$tenantId/users',
+        queryParameters: queryParams, options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
-  Future<PageData<User>> getCustomerUsers(String customerId, PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getCustomerUsers(String customerId, PageLink pageLink, {RequestConfig? requestConfig}) async {
     var queryParams = pageLink.toQueryParameters();
-    var response = await _tbClient.get<Map<String, dynamic>>(
-        '/api/customer/$customerId/users',
-        queryParameters: queryParams,
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response = await _tbClient.get<Map<String, dynamic>>('/api/customer/$customerId/users',
+        queryParameters: queryParams, options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
-  Future<PageData<User>> getAllCustomerUsers(PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getAllCustomerUsers(PageLink pageLink, {RequestConfig? requestConfig}) async {
     var queryParams = pageLink.toQueryParameters();
-    var response = await _tbClient.get<Map<String, dynamic>>(
-        '/api/customer/users',
-        queryParameters: queryParams,
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response =
+        await _tbClient.get<Map<String, dynamic>>('/api/customer/users', queryParameters: queryParams, options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
-  Future<PageData<User>> getUserUsers(PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getUserUsers(PageLink pageLink, {RequestConfig? requestConfig}) async {
     var response = await _tbClient.get<Map<String, dynamic>>('/api/user/users',
-        queryParameters: pageLink.toQueryParameters(),
-        options: defaultHttpOptionsFromConfig(requestConfig));
+        queryParameters: pageLink.toQueryParameters(), options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
-  Future<List<User>> getUsersByIds(List<String> userIds,
-      {RequestConfig? requestConfig}) async {
-    var response = await _tbClient.get<List<dynamic>>('/api/users',
-        queryParameters: {'userIds': userIds.join(',')},
-        options: defaultHttpOptionsFromConfig(requestConfig));
+  Future<List<User>> getUsersByIds(List<String> userIds, {RequestConfig? requestConfig}) async {
+    var response =
+        await _tbClient.get<List<dynamic>>('/api/users', queryParameters: {'userIds': userIds.join(',')}, options: defaultHttpOptionsFromConfig(requestConfig));
     return response.data!.map((e) => User.fromJson(e)).toList();
   }
 
-  Future<PageData<User>> getUsersByEntityGroupId(
-      String entityGroupId, PageLink pageLink,
-      {RequestConfig? requestConfig}) async {
+  Future<PageData<User>> getUsersByEntityGroupId(String entityGroupId, PageLink pageLink, {RequestConfig? requestConfig}) async {
     var queryParams = pageLink.toQueryParameters();
-    var response = await _tbClient.get<Map<String, dynamic>>(
-        '/api/entityGroup/$entityGroupId/users',
-        queryParameters: queryParams,
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response = await _tbClient.get<Map<String, dynamic>>('/api/entityGroup/$entityGroupId/users',
+        queryParameters: queryParams, options: defaultHttpOptionsFromConfig(requestConfig));
     return _tbClient.compute(parseUserPageData, response.data!);
   }
 
-  Future<void> setUserCredentialsEnabled(String userId,
-      {bool? userCredentialsEnabled, RequestConfig? requestConfig}) async {
+  Future<void> setUserCredentialsEnabled(String userId, {bool? userCredentialsEnabled, RequestConfig? requestConfig}) async {
     var queryParams = <String, dynamic>{};
     if (userCredentialsEnabled != null) {
       queryParams['userCredentialsEnabled'] = userCredentialsEnabled;
     }
-    await _tbClient.post('/api/user/$userId/userCredentialsEnabled',
-        queryParameters: queryParams,
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    await _tbClient.post('/api/user/$userId/userCredentialsEnabled', queryParameters: queryParams, options: defaultHttpOptionsFromConfig(requestConfig));
   }
 
   Future<User> getUser({RequestConfig? requestConfig}) async {
-    var response = await _tbClient.get<Map<String, dynamic>>('/api/auth/user',
-        options: defaultHttpOptionsFromConfig(requestConfig));
+    var response = await _tbClient.get<Map<String, dynamic>>('/api/auth/user', options: defaultHttpOptionsFromConfig(requestConfig));
     return User.fromJson(response.data!);
   }
 
-  Future<UserPasswordPolicy?> getUserPasswordPolicy(
-      {RequestConfig? requestConfig}) async {
+  Future<UserPasswordPolicy?> getUserPasswordPolicy({RequestConfig? requestConfig}) async {
     return nullIfNotFound(
       (RequestConfig requestConfig) async {
-        var response = await _tbClient.get<Map<String, dynamic>>(
-            '/api/noauth/userPasswordPolicy',
-            options: defaultHttpOptionsFromConfig(requestConfig));
-        return response.data != null
-            ? UserPasswordPolicy.fromJson(response.data!)
-            : null;
+        var response = await _tbClient.get<Map<String, dynamic>>('/api/noauth/userPasswordPolicy', options: defaultHttpOptionsFromConfig(requestConfig));
+        return response.data != null ? UserPasswordPolicy.fromJson(response.data!) : null;
       },
       requestConfig: requestConfig,
     );
   }
 
-  Future<String> getActivateToken(String userId,
-      {RequestConfig? requestConfig}) async {
-    var activationLink =
-        await getActivationLink(userId, requestConfig: requestConfig);
-    return activationLink.substring(
-        activationLink.lastIndexOf(ACTIVATE_TOKEN_REGEX) +
-            ACTIVATE_TOKEN_REGEX.length);
+  Future<String> getActivateToken(String userId, {RequestConfig? requestConfig}) async {
+    var activationLink = await getActivationLink(userId, requestConfig: requestConfig);
+    return activationLink.substring(activationLink.lastIndexOf(ACTIVATE_TOKEN_REGEX) + ACTIVATE_TOKEN_REGEX.length);
   }
 
-  Future<String> checkActivateToken(String userId,
-      {RequestConfig? requestConfig}) async {
-    var activateToken =
-        await getActivateToken(userId, requestConfig: requestConfig);
+  Future<String> checkActivateToken(String userId, {RequestConfig? requestConfig}) async {
+    var activateToken = await getActivateToken(userId, requestConfig: requestConfig);
     var options = defaultHttpOptionsFromConfig(requestConfig);
     options.responseType = ResponseType.plain;
-    var response = await _tbClient.get<String>('/api/noauth/activate',
-        queryParameters: {'activateToken': activateToken}, options: options);
+    var response = await _tbClient.get<String>('/api/noauth/activate', queryParameters: {'activateToken': activateToken}, options: options);
     return response.data!;
   }
 
-  Future<LoginResponse?> activateUser(String userId, String password,
-      {bool sendActivationMail = true, RequestConfig? requestConfig}) async {
-    var activateToken =
-        await getActivateToken(userId, requestConfig: requestConfig);
+  Future<LoginResponse?> activateUser(String userId, String password, {bool sendActivationMail = true, RequestConfig? requestConfig}) async {
+    var activateToken = await getActivateToken(userId, requestConfig: requestConfig);
     return nullIfNotFound(
       (RequestConfig requestConfig) async {
-        var response = await _tbClient.post<Map<String, dynamic>>(
-            '/api/noauth/activate',
+        var response = await _tbClient.post<Map<String, dynamic>>('/api/noauth/activate',
             queryParameters: {'sendActivationMail': sendActivationMail},
-            data: jsonEncode(
-                {'activateToken': activateToken, 'password': password}),
+            data: jsonEncode({'activateToken': activateToken, 'password': password}),
             options: defaultHttpOptionsFromConfig(requestConfig));
-        return response.data != null
-            ? LoginResponse.fromJson(response.data!)
-            : null;
+        return response.data != null ? LoginResponse.fromJson(response.data!) : null;
       },
       requestConfig: requestConfig,
     );
   }
 
-  Future<MobileSessionInfo?> getMobileSession(String mobileToken,
-      {RequestConfig? requestConfig}) async {
+  Future<MobileSessionInfo?> getMobileSession(String mobileToken, {RequestConfig? requestConfig}) async {
     final options = defaultHttpOptionsFromConfig(requestConfig);
     options.headers?[MOBILE_TOKEN_HEADER] = mobileToken;
     final response = await _tbClient.get(
@@ -265,17 +204,13 @@ class UserService {
       options: options,
     );
     try {
-      return response.data != null
-          ? MobileSessionInfo.fromJson(response.data!)
-          : null;
+      return response.data != null ? MobileSessionInfo.fromJson(response.data!) : null;
     } catch (_) {
       return null;
     }
   }
 
-  Future<void> saveMobileSession(
-      String mobileToken, MobileSessionInfo sessionInfo,
-      {RequestConfig? requestConfig}) async {
+  Future<void> saveMobileSession(String mobileToken, MobileSessionInfo sessionInfo, {RequestConfig? requestConfig}) async {
     final options = defaultHttpOptionsFromConfig(requestConfig);
     options.headers?[MOBILE_TOKEN_HEADER] = mobileToken;
     await _tbClient.post<void>(
@@ -285,8 +220,7 @@ class UserService {
     );
   }
 
-  Future<void> removeMobileSession(String mobileToken,
-      {RequestConfig? requestConfig}) async {
+  Future<void> removeMobileSession(String mobileToken, {RequestConfig? requestConfig}) async {
     final options = defaultHttpOptionsFromConfig(requestConfig);
     options.headers?[MOBILE_TOKEN_HEADER] = mobileToken;
     await _tbClient.delete<void>(
