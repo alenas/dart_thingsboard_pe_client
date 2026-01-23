@@ -19,12 +19,7 @@ import 'id/asset_id.dart';
 import 'id/customer_id.dart';
 import 'id/tenant_id.dart';
 
-class AssetProfile extends BaseData<AssetProfileId>
-    with
-        HasName,
-        HasTenantId,
-        HasRuleEngineProfile,
-        ExportableEntity<AssetProfileId> {
+class AssetProfile extends BaseData<AssetProfileId> with HasName, HasTenantId, HasRuleEngineProfile, ExportableEntity<AssetProfileId> {
   TenantId? tenantId;
   String name;
   String? description;
@@ -44,19 +39,11 @@ class AssetProfile extends BaseData<AssetProfileId>
         description = json['description'],
         isDefault = json['default'],
         image = json['image'],
-        defaultRuleChainId = json['defaultRuleChainId'] != null
-            ? RuleChainId.fromJson(json['defaultRuleChainId'])
-            : null,
-        defaultDashboardId = json['defaultDashboardId'] != null
-            ? DashboardId.fromJson(json['defaultDashboardId'])
-            : null,
+        defaultRuleChainId = json['defaultRuleChainId'] != null ? RuleChainId.fromJson(json['defaultRuleChainId']) : null,
+        defaultDashboardId = json['defaultDashboardId'] != null ? DashboardId.fromJson(json['defaultDashboardId']) : null,
         defaultQueueName = json['defaultQueueName'],
-        defaultEdgeRuleChainId = json['defaultEdgeRuleChainId'] != null
-            ? RuleChainId.fromJson(json['defaultEdgeRuleChainId'])
-            : null,
-        externalId = json['externalId'] != null
-            ? AssetProfileId.fromJson(json['externalId'])
-            : null,
+        defaultEdgeRuleChainId = json['defaultEdgeRuleChainId'] != null ? RuleChainId.fromJson(json['defaultEdgeRuleChainId']) : null,
+        externalId = json['externalId'] != null ? AssetProfileId.fromJson(json['externalId']) : null,
         super.fromJson(json);
 
   @override
@@ -146,14 +133,10 @@ class AssetProfileInfo extends EntityInfo {
   String? image;
   TenantId? tenantId;
 
-  AssetProfileInfo(EntityId id, String name, this.image,
-      this.defaultDashboardId, this.tenantId)
-      : super(id, name);
+  AssetProfileInfo(EntityId id, String name, this.image, this.defaultDashboardId, this.tenantId) : super(id, name);
 
   AssetProfileInfo.fromJson(Map<String, dynamic> json)
-      : defaultDashboardId = json['defaultDashboardId'] != null
-            ? DashboardId.fromJson(json['defaultDashboardId'])
-            : null,
+      : defaultDashboardId = json['defaultDashboardId'] != null ? DashboardId.fromJson(json['defaultDashboardId']) : null,
         image = json['image'],
         tenantId = TenantId.fromJson(json['tenantId']),
         super.fromJson(json);
@@ -166,9 +149,7 @@ class AssetProfileInfo extends EntityInfo {
   }
 }
 
-class Asset extends AdditionalInfoBased<AssetId>
-    with ExportableEntity<AssetId>
-    implements GroupEntity<AssetId> {
+class Asset extends AdditionalInfoBased<AssetId> with ExportableEntity<AssetId> implements GroupEntity<AssetId> {
   TenantId? tenantId;
   CustomerId? customerId;
   String name;
@@ -181,16 +162,12 @@ class Asset extends AdditionalInfoBased<AssetId>
 
   Asset.fromJson(Map<String, dynamic> json)
       : tenantId = TenantId.fromJson(json['tenantId']),
-        customerId = json['customerId'] != null
-            ? CustomerId.fromJson(json['customerId'])
-            : null,
+        customerId = json['customerId'] != null ? CustomerId.fromJson(json['customerId']) : null,
         name = json['name'],
         type = json['type'],
         label = json['label'],
-        assetProfileId = AssetProfileId.fromJson(json['assetProfileId']),
-        externalId = json['externalId'] != null
-            ? AssetId.fromJson(json['externalId'])
-            : null,
+        assetProfileId = json['assetProfileId'] != null ? AssetProfileId.fromJson(json['assetProfileId']) : null,
+        externalId = json['externalId'] != null ? AssetId.fromJson(json['externalId']) : null,
         super.fromJson(json);
 
   @override
@@ -243,9 +220,7 @@ class Asset extends AdditionalInfoBased<AssetId>
 
   @override
   EntityId? getOwnerId() {
-    return customerId != null && !customerId!.isNullUid()
-        ? customerId
-        : tenantId;
+    return customerId != null && !customerId!.isNullUid() ? customerId : tenantId;
   }
 
   @override
@@ -281,10 +256,7 @@ class Asset extends AdditionalInfoBased<AssetId>
 class AssetSearchQuery extends EntitySearchQuery {
   List<String> assetTypes;
 
-  AssetSearchQuery(
-      {required RelationsSearchParameters parameters,
-      required this.assetTypes,
-      String? relationType})
+  AssetSearchQuery({required RelationsSearchParameters parameters, required this.assetTypes, String? relationType})
       : super(parameters: parameters, relationType: relationType);
 
   @override
